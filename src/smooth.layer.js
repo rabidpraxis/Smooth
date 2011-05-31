@@ -4,11 +4,9 @@
 
   $.fn.toss = function(vel) {
     var	$obj = this, 
-        xVel = vel[0],
-        yVel = vel[1],
-        translateY = ($obj.position().top + yVel*8),
-        translateX = ($obj.position().left + xVel*8);
-        mag = Math.sqrt(xVel * xVel + yVel * yVel),
+        translateY = ($obj.position().top + vel.y*8),
+        translateX = ($obj.position().left + vel.x*8);
+        mag = Math.sqrt(vel.x * vel.x + vel.y * vel.y),
         time_cof = (Math.abs(mag - 180) / 180) * 2.5;
 
     // console.log('t_cof: ' + time_cof + "\nMag: " + mag + "\n" + "Pos: " + [translateY, translateX]);
@@ -17,7 +15,7 @@
   }
 
   $.fn.move = function(obj) {
-    var o_pos = this.position(),
+    var o_pos = this.offset(),
         bounds_snap = 300;
 
     // Deal with boundaries, add max pull and counterweight
@@ -36,14 +34,15 @@
     }
 
     this.transform({tY:o_pos.top + obj.tY,
-                   tX:o_pos.left + obj.tX});
+                    tX:o_pos.left + obj.tX});
+
     return this;
   };
 
   $.fn.stop = function() {
     this[0].animating = false;
     this.transition({time:0})
-        .transform({tX:this.position().left, tY:this.position().top});
+        .transform({tX:this.offset().left, tY:this.offset().top});
   }
 
   $.fn.transition = function(options) {
@@ -61,8 +60,9 @@
   // Also reads data for directional constraints
   $.fn.transform = function(options){
     var t_str = "",
-        left = this.position().left,
-        top = this.position().top;
+        left = this.offset().left,
+        top = this.offset().top;
+
     // 2D Version
     // if (typeof(options['tX']) != 'undefined') 
     //   t_str += " translateX(" + options['tX'] + "px)";
@@ -80,16 +80,21 @@
     // Deal with constraints
     if(this.data('constraint') != 'undefined') {
       if(this.data('constraint') == 'y') {
-        tX = left;
+        tX = '0px';
       } else if (this.data('constraint') == 'x') {
-        tY = top;
+        tY = '0px';
       }
     }
+    
 
     if (tX != "0px" || tY != "0px" || tZ != "0px") 
       t_str = "translate3d(" + tX + ", " + tY + ", " + tZ + ")";
+    // Rotate
     if (typeof(options['rot']) != 'undefined') 
       t_str += " rotate(" + options['rot'] + ")";
+    // Scale
+    if (typeof(options['scale']) != 'undefined') 
+      t_str += " scale(" + options['scale'] + ")";
 
     this[0].style.webkitTransform = t_str;
     return this;

@@ -6,7 +6,7 @@
 		mousedown: false,
 		prevX: -1,
 		prevY: -1,
-		velocity: [0,0],
+		velocity: {x:0,y:0},
 
 		// Touch Session
 		session_move_time: 0,
@@ -43,7 +43,6 @@
 
 		// Let the throwing begin!
 		self.bind("mousedown", function(e){
-			console.log('clickdown');
 			// Stop movement
 			$(window).bind("touchdown", function(e){
 				self.stop();
@@ -51,7 +50,7 @@
 
 			// Register for mouse move event
 			$(window).bind("touchmoved", function(e, vel){
-				self.move({tX: vel[0], tY: vel[1]});
+				self.move({tX: vel.x, tY: vel.y});
 			});
 			
 			// Register for throw event
@@ -63,10 +62,10 @@
 
 			$(window).bind("touchup", function(e){
 				console.log('touchup');
-				if(self.position().left > 0) 
+				if(self.offset().left > 0) 
 					self.transition({time: .8})
-							.transform({tX:0, tY:self.position().top});
-				if(self.position().left < (self.data('container_width')-self.outerWidth()))
+							.transform({tX:0, tY:self.offset().top});
+				if(self.offset().left < (self.data('container_width')-self.outerWidth()))
 					self.transition({time: .8})
 							.transform({tX:self.data('container_width')-self.outerWidth(), tY:self.position().top});
 			});
@@ -92,7 +91,7 @@
 
 			$(this).bind("mousedown", function(e){
 				$(window).bind("touchtap", function(e){
-					console.log('tapped');
+					options.tapped();
 				});
 			});
 		});
@@ -166,11 +165,11 @@
 			if (_smg.mousedown) {
 				var eX = e.pageX, eY = e.pageY;
 				// Calculate current velocity
-				_smg.velocity = [eX-_smg.prevX, eY-_smg.prevY];
+				_smg.velocity = {x:eX-_smg.prevX, y:eY-_smg.prevY};
 
 				// update session movement
-				_smg.session_movement = [_smg.session_movement[0] + Math.abs(_smg.velocity[0]),
-																 _smg.session_movement[1] + Math.abs(_smg.velocity[1])];
+				_smg.session_movement = [_smg.session_movement[0] + Math.abs(_smg.velocity.x),
+																 _smg.session_movement[1] + Math.abs(_smg.velocity.y)];
 
 				// update previous position
 				_smg.prevX = eX; _smg.prevY = eY;
