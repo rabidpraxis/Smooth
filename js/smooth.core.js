@@ -1,7 +1,7 @@
 // Smooth: The ultimate html animation framework
 (function( $, undefined ) {
 	
-	// Initialize smooth object
+	// {_smg}: Initialize smooth data object {{{1
 	var _smg = {
 		mousedown: false,
 		prevX: -1,
@@ -17,8 +17,8 @@
 			if(_move[0] > 2 || _move[1] > 2) return true;
 			return false;
 		}
-	}
-
+	}//}}}
+	// $.throwable(): Endow throwing interaction on element {{{1
   $.fn.throwable = function(options) {
 		var self = this;
 
@@ -26,6 +26,7 @@
 		if (typeof(options['constraint']) != 'undefined') {
 			self.data('constraint', options['constraint']);
 		};
+		
 		// Explicit object container
 		if (typeof(options['container']) != 'undefined') {
 			self.data('container', options['container']);
@@ -37,9 +38,6 @@
 				self.data('container_top', $(options['container']).position().top);
 			}, 30);
 		};
-		
-		// For flickering
-		// self[0].style.webkitBackfaceVisibility = "hidden";
 
 		// Let the throwing begin!
 		self.bind("mousedown", function(e){
@@ -55,7 +53,6 @@
 			
 			// Register for throw event
 			$(window).bind("touchthrow", function(e, vel){
-				console.log('touchthrow');
 				self[0].animating = true;
 				self.toss(vel);
 			});
@@ -80,30 +77,36 @@
 
 		self[0].addEventListener('webkitTransitionEnd', 
 			 function(event) { 
+				 console.log(event, self);
 				 self[0].animating = false 
 			 }, false );
-	}
-
-
+	}//}}}
+	// $.tappable(): Endow tapping action on element {{{1
 	$.fn.tappable = function(options) {
 		return this.each(function(){
+			var self = $(this);
 			this.style.webkitBackfaceVisibility = "hidden";
 
-			$(this).bind("mousedown", function(e){
+			self.bind("mousedown", function(e){
+				// Register for smooth tap event
 				$(window).bind("touchtap", function(e){
 					options.tapped();
 				});
 			});
 		});
-	}
-
-	$.fn.holdable = function(options){
+	}//}}}
+	// $.holdable(): Endow extended tap action on element {{{1
+	$.fn.holdable = function(options) {
 		this.click(function(e) {
 			if (!_smg.did_move()) { 
 				console.log('held');
 				callback();
 			}
 		})
+	}//}}}
+
+	function _o(msg) {
+		console.log(msg);
 	}
 
 	function anim_check() {
@@ -113,6 +116,7 @@
 		}, 80);
 	}
 
+	// smooth_init(): setup event bindings and general bootstrapping {{{1
 	function smooth_init() {
 		// Global animation check binding
 		anim_check();
@@ -126,7 +130,7 @@
 
 			_smg.prevX = e.pageX;
 			_smg.prevY = e.pageY;
-		})
+		});
 
 		$(window).bind("mouseup", function(e){
 			$(window).trigger("touchup");
@@ -159,7 +163,7 @@
 			$.each(['touchmoved', 'touchthrow', 'touchdown', 'touchup', 'touchtap'], function(i, binding){
 				$(window).unbind(binding);
 			});
-		})
+		});
 
 		$(window).bind("mousemove", function(e){
 			if (_smg.mousedown) {
@@ -180,7 +184,10 @@
 				_smg.session_move_time = (new Date).getTime();
 			};
 		})
-	}
-	smooth_init();
+	}//}}}
+	
+	smooth_init(); // Lets go
 
 })( jQuery );
+
+

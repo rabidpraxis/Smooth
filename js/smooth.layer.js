@@ -1,8 +1,9 @@
 (function( $, undefined ) {
 
   var TRANFORM_TYPE = '3d';
-
-  $.fn.toss = function(vel) {
+  
+  // $.toss(): Algorithm and execution of iOS like throwing movement {{{1
+  $.fn.toss = function(vel) {//
     var	$obj = this, 
         translateY = ($obj.position().top + vel.y*8),
         translateX = ($obj.position().left + vel.x*8);
@@ -12,9 +13,9 @@
     // console.log('t_cof: ' + time_cof + "\nMag: " + mag + "\n" + "Pos: " + [translateY, translateX]);
     $obj.transition({time:1});
     $obj.transform({tX:translateX, tY:translateY});
-  }
-
-  $.fn.move = function(obj) {
+  }//}}}
+  // $.move(): Relative movement from current position {{{1
+  $.fn.move = function(obj) {//
     var o_pos = this.offset(),
         bounds_snap = 300;
 
@@ -37,14 +38,14 @@
                     tX:o_pos.left + obj.tX});
 
     return this;
-  };
-
+  };//}}}
+  // $.stop(): Stop transition animation {{{1
   $.fn.stop = function() {
     this[0].animating = false;
     this.transition({time:0})
         .transform({tX:this.offset().left, tY:this.offset().top});
-  }
-
+  }//}}}
+  // $.transition(): Helper Function for inputting CSS transitions {{{1
   $.fn.transition = function(options) {
     var ease  = (typeof(options['ease']) == 'undefined') 
                 ? "cubic-bezier(0.001, 0.001, 0.001, 1.000)" : options['ease'],
@@ -54,11 +55,11 @@
     
     this[0].style.webkitTransition = t_str;
     return this;
-  }
-
-  // Optional hash with key's: tX, tY, tZ, rot
-  // Also reads data for directional constraints
-  $.fn.transform = function(options){
+  }//}}}
+  // $.transform(): Helper function for tranforming elements via CSS {{{1
+  //   Optional hash with key's: tX, tY, tZ, rot, scale
+  //   Also reads data for directional constraints
+  $.fn.transform = function(options){//
     var t_str = "",
         left = this.offset().left,
         top = this.offset().top;
@@ -98,6 +99,8 @@
 
     this[0].style.webkitTransform = t_str;
     return this;
-  };
+  };//}}}
+
 
 })( jQuery );
+
