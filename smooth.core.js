@@ -190,4 +190,4 @@
 
 })( jQuery );
 
-
+// vim:fdm=marker
