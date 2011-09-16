@@ -209,9 +209,11 @@ $.fn.tappable = (options) ->
     # tap_start: (bubbled item, parent item)
     options.tap_start mouse_event.target, self if options.tap_start?
 
-    # tapped: (bubbled item, parent item)
+    # tapped callback
+    # return: Current Target,
+    #         Caller
     $(window).bind "touchtap", touch_tap_call = (e, tap_time) ->
-      options.tapped mouse_event.target, self, mouse_event if options.tapped?
+      options.tapped mouse_event.target, self if options.tapped?
       # stop triggering!!
       $(window).trigger "touchcomplete"
 
@@ -238,10 +240,14 @@ $.fn.strokeable = (options) ->
     options.stroke_start self if options.stroke_start?
     options.stroked self, pos if options.stroked?
 
+    # touchmoved callback
+    # return: Current Target,
+    #         Original Target,
+    #         Delta Position
     $(window).bind "touchmoved", touch_stroke_call = (e, vel, e_win) ->
       pos.x += vel.x
       pos.y += vel.y
-      options.stroked e_win, pos if options.stroked?
+      options.stroked e_win.target, mouse_e.target, pos if options.stroked?
 
     $(window).bind "touchcomplete", touch_complete_call = ->
       options.complete mouse_e if options.complete?
