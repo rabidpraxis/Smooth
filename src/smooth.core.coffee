@@ -234,20 +234,31 @@ $.fn.strokeable = (options) ->
   self = $(this)
   # use pos to calculate relative position change to layer
   pos = {x: 0, y: 0}
+  width = self.width()
+  height = self.height()
   self.bind "mousedown", (mouse_e) ->
-    pos = {x: mouse_e.offsetX, y: mouse_e.offsetY}
+    pos = {x: mouse_e.layerX, y: mouse_e.layerY}
 
     options.stroke_start self if options.stroke_start?
-    options.stroked self, pos if options.stroked?
 
     # touchmoved callback
-    # return: Current Target,
-    #         Original Target,
-    #         Delta Position
-    $(window).bind "touchmoved", touch_stroke_call = (e, vel, e_win) ->
+    $(window).bind "touchmoved", touch_stroke_call = (e, vel, win_e) ->
       pos.x += vel.x
       pos.y += vel.y
-      options.stroked e_win.target, mouse_e.target, pos if options.stroked?
+      return_obj =
+        delta_pos: pos
+        normal_parent_pos:
+          x: pos.x / width
+          y: pos.y / height
+        parent_pos:
+          x: mouse_e.layerX
+          y: mouse_e.layerY
+        target: win_e.target
+        caller: mouse_e.target
+        window_event: win_e
+        mouse_event: mouse_e
+
+      options.stroked return_obj if options.stroked?
 
     $(window).bind "touchcomplete", touch_complete_call = ->
       options.complete mouse_e if options.complete?
