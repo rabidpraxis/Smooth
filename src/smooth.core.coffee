@@ -210,10 +210,17 @@ $.fn.tappable = (options) ->
     options.tap_start mouse_event.target, self if options.tap_start?
 
     # tapped callback
-    # return: Current Target,
-    #         Caller
-    $(window).bind "touchtap", touch_tap_call = (e, tap_time) ->
-      options.tapped mouse_event.target, self if options.tapped?
+    $(window).bind "touchtap", touch_tap_call = (e, tap_time, win_e) ->
+      return_obj =
+        normal_parent_pos:
+          x: mouse_event.offsetX / self.width()
+          y: mouse_event.offsetY / self.height()
+        target: mouse_event.target
+        caller: self
+        window_event: win_e
+        mouse_event: mouse_event
+
+      options.tapped return_obj if options.tapped?
       # stop triggering!!
       $(window).trigger "touchcomplete"
 
@@ -229,7 +236,7 @@ $.fn.holdable = (options) ->
     unless _smg.did_move()
       console.log "held"
 # }}} 
-# $.strokeable(): Slide across an item and grab your position {{{1
+# $.strokeable(): grab your position while sliding across an item {{{1
 $.fn.strokeable = (options) ->
   self = $(this)
   # use pos to calculate relative position change to layer
@@ -238,6 +245,7 @@ $.fn.strokeable = (options) ->
   height = self.height()
   self.bind "mousedown", (mouse_e) ->
     pos = {x: mouse_e.layerX, y: mouse_e.layerY}
+    session_movement = {x: 0, y: 0}
 
     options.stroke_start self if options.stroke_start?
 
@@ -245,6 +253,8 @@ $.fn.strokeable = (options) ->
     $(window).bind "touchmoved", touch_stroke_call = (e, vel, win_e) ->
       pos.x += vel.x
       pos.y += vel.y
+      session_movement.x += Math.abs(vel.x)
+      session_movement.y += Math.abs(vel.y)
       return_obj =
         delta_pos: pos
         normal_parent_pos:
@@ -255,6 +265,8 @@ $.fn.strokeable = (options) ->
           y: mouse_e.layerY
         target: win_e.target
         caller: mouse_e.target
+        vel: vel
+        session_movement: session_movement
         window_event: win_e
         mouse_event: mouse_e
 
@@ -295,7 +307,7 @@ do ->
   # }}}
   # window.mousedown event {{{2
   $(window).bind "mousedown", (e) ->
-    $(window).trigger "touchdown"
+    $(window).trigger "touchdown", [e]
     _smg.mousedown = true
     _smg.session_move_time = (new Date).getTime()
     _smg.session_start_time = (new Date).getTime()
@@ -303,9 +315,9 @@ do ->
     _smg.prevY = e.pageY
   # }}}
   # window.mouseup event {{{2
-  $(window).bind 'mouseup', ->
+  $(window).bind 'mouseup', (e) ->
   # $(window).bind "mouseup", (e) ->
-    $(window).trigger "touchup"
+    $(window).trigger "touchup", [e]
     _smg.prev_session_movement = _smg.session_movement
     _smg.session_movement = [ 0, 0 ]
     time_now = (new Date).getTime()
@@ -316,8 +328,8 @@ do ->
       not _smg.did_move() and
       not _smg.tap_stopped_animation
   
-    $(window).trigger "touchtap", [ total_tap_time ] if tapworthy()
-    $(window).trigger "touchthrow", [ _smg.velocity ] if time_since_movement < 40
+    $(window).trigger "touchtap", [ total_tap_time, e ] if tapworthy()
+    $(window).trigger "touchthrow", [ _smg.velocity, e ] if time_since_movement < 40
 
     _smg.tap_stopped_animation = false
     _smg.throwing = []
