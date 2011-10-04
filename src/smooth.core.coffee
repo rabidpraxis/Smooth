@@ -278,22 +278,6 @@ $.fn.strokeable = (options) ->
       $(window).unbind "touchcomplete", touch_complete_call
 #}}}
 
-# _o(), _ol(), _oll Logging Helpers {{{1
-
-# Direct injection into console log
-window._o = (msgs...) ->
-  console.log msgs
-
-# Compose object into multiple lines 
-window._ol = (msg_obj) ->
-  for name, value of msg_obj
-    console.log "#{value}: #{name}"
-
-# Compose object into multiple lines 
-window._oll = (title, msg_obj) ->
-  console.warn "######### #{title} #########"
-  _ol(msg_obj)
-# }}}
 # (): setup event bindings and general bootstrapping {{{1
 do ->
   
