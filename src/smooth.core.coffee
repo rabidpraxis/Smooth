@@ -1,26 +1,6 @@
-$ = jQuery
-window.vel_differences = [] # TODO: Remove this after tweaking
 clickable = true
 window.display_stats = false
 attract_timeout = 5000
-
-# {_smg}: Initialize smooth data object {{{1
-_smg =
-  mousedown: false
-  prevX: -1
-  prevY: -1
-  velocity:
-    x: 0
-    y: 0
-  
-  session_move_time: 0
-  session_movement: [ 0, 0 ]
-  prev_session_movement: [ 0, 0 ]
-  did_move: ->
-    _move = _smg.prev_session_movement
-    return true  if _move[0] > 22 or _move[1] > 22
-    false
-# }}} 
 
 # $.attractable(): Allow for attraction screen to be loaded when unused {{{1
 $.fn.attractable = (options) ->
@@ -278,71 +258,78 @@ $.fn.strokeable = (options) ->
       $(window).unbind "touchcomplete", touch_complete_call
 #}}}
 
-# (): setup event bindings and general bootstrapping {{{1
-do ->
-  
-  # anim_check(): Slow timeout animation checker {{{2
-  anim_check = ->
-    setTimeout (->
-      $(window).trigger "animcheck"
-      anim_check()
-    ), 80
-  anim_check()
-  # }}}
-  # window.mousedown event {{{2
-  $(window).bind "mousedown", (e) ->
-    $(window).trigger "touchdown", [e]
-    _smg.mousedown = true
-    _smg.session_move_time = (new Date).getTime()
-    _smg.session_start_time = (new Date).getTime()
-    _smg.prevX = e.pageX
-    _smg.prevY = e.pageY
-  # }}}
-  # window.mouseup event {{{2
-  $(window).bind 'mouseup', (e) ->
-  # $(window).bind "mouseup", (e) ->
-    $(window).trigger "touchup", [e]
-    _smg.prev_session_movement = _smg.session_movement
-    _smg.session_movement = [ 0, 0 ]
+class SmoothNotifier
+  constructor: ->
+    @mousedown = false
+    @prevX = @prevY = -1
+    @velocity = { x: 0, y: 0 }
+    @session_move_time = 0
+    @session_movement = @prev_session_movement = [ 0, 0 ]
+
+    this.init()
+
+  init: ->
+    $(window).bind "mousedown",  this.touchdown
+    $(window).bind 'mouseup',    this.touchup
+    $(window).bind "mousemove",  this.touchmove
+
+  did_move: ->
+    _move = @prev_session_movement
+    ( _move[0] > 22 ) or ( _move[1] > 22 )
+
+  tapworthy: ->
+    not this.did_move() and
+    not @tap_stopped_animation
+
+  touchdown: (event) =>
+    $(window).trigger "touchdown", [event]
+    @mousedown = true
+    @session_move_time = @session_start_time = (new Date).getTime()
+    @prevX = event.pageX
+    @prevY = event.pageY
+
+  touchup: (event) =>
+    $(window).trigger "touchup", [event]
+    @prev_session_movement = @session_movement
+    @session_movement = [ 0, 0 ]
     time_now = (new Date).getTime()
-    time_since_movement = time_now - _smg.session_move_time
-    total_tap_time = time_now - _smg.session_start_time
+    time_since_movement = time_now - @session_move_time
+    total_tap_time = time_now - @session_start_time
+    
+    $(window).trigger "touchtap", [ total_tap_time, event ] if this.tapworthy()
+    $(window).trigger "touchthrow", [ @velocity, event ] if time_since_movement < 40
 
-    tapworthy = ->
-      not _smg.did_move() and
-      not _smg.tap_stopped_animation
-  
-    $(window).trigger "touchtap", [ total_tap_time, e ] if tapworthy()
-    $(window).trigger "touchthrow", [ _smg.velocity, e ] if time_since_movement < 40
-
-    _smg.tap_stopped_animation = false
-    _smg.throwing = []
-    _smg.velocity = [ 0, 0 ]
-    _smg.mousedown = false
-    _smg.prevX = 0
-    _smg.prevY = 0
+    @tap_stopped_animation = false
+    @throwing = []
+    @velocity = [ 0, 0 ]
+    @mousedown = false
+    @prevX = @prevY = 0
     $(window).trigger "touchcomplete"
-  # }}}
-  # window.mousemove event {{{2
-  $(window).bind "mousemove", (e) ->
-    if _smg.mousedown
-      eX = e.pageX
-      eY = e.pageY
-      _smg.velocity =
-        x: eX - _smg.prevX
-        y: eY - _smg.prevY
-      
-      _smg.session_movement = [
-        _smg.session_movement[0] + Math.abs(_smg.velocity.x),
-        _smg.session_movement[1] + Math.abs(_smg.velocity.y)
-      ]
-      _smg.prevX = eX
-      _smg.prevY = eY
-      $(window).trigger "touchmoved", [ _smg.velocity, e ]
-      _smg.session_move_time = (new Date).getTime()
-  # }}}
 
-  
-# }}} 
+  touchmove: (event) =>
+    if @mousedown
+      eX = event.pageX
+      eY = event.pageY
+      @velocity =
+        x: eX - @prevX
+        y: eY - @prevY
+      
+      @session_movement = [
+        @session_movement[0] + Math.abs(@velocity.x),
+        @session_movement[1] + Math.abs(@velocity.y)
+      ]
+      @prevX = eX
+      @prevY = eY
+      $(window).trigger "touchmoved", [ @velocity, event ]
+      @session_move_time = (new Date).getTime()
+
+window.smooth = new SmoothNotifier()
+
+anim_check = ->
+  setTimeout (->
+    $(window).trigger "animcheck"
+    anim_check()
+  ), 80
+anim_check()
 
 # vim:fdm=marker
