@@ -1,0 +1,52 @@
+<html>
+  <head>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../vendor/underscore/underscore.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../lib/smooth.core.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../lib/smooth.layer.js" type="text/javascript" charset="utf-8"></script>
+    <style type="text/css" media="screen">
+      #single_tapbox {
+        width: 800px;
+        height: 100px;
+        background-color: #aaa;
+        float: left;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+      }
+      #info {
+        position: absolute;
+        top: 140px;
+      }
+      #move {
+        width: 20px;
+        height: 20px;
+        position: absolute;
+        background-color: #FFF;
+      }
+    </style>
+    <script type="text/javascript" charset="utf-8">
+      $(document).ready(function(){
+        $('#single_tapbox').strokeable({
+          stroked: function(r){
+            $('#move').css({'top': r.pos.y, 'left': r.pos.x});
+            $('#x_perc').text(r.normal_pos().x * 100);
+            $('#y_perc').text(r.normal_pos().y * 100);
+          }
+        })
+      })
+    </script>
+
+  </head>
+  <body>
+    <div id="single_tapbox">
+      <div id="move"></div>
+    </div>
+    <div id="info">
+      <p>X - <span id="x_perc"></span> % </p>
+      <p>Y - <span id="y_perc"></span> % </p>
+    </div>
+  </body>
+</html>

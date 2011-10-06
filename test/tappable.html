@@ -1,20 +1,83 @@
 <html>
   <head>
-    <script src="../src/smooth.core.js" type="text/javascript" charset="utf-8"></script>
-    <script src="../src/smooth.layer.js" type="text/javascript" charset="utf-8"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../vendor/underscore/underscore.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../lib/smooth.core.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../lib/smooth.layer.js" type="text/javascript" charset="utf-8"></script>
     <style type="text/css" media="screen">
-      #tapbox {
+      #single_tapbox {
         width: 400px;
         height: 400px;
         background-color: #aaa;
+        float: left;
+      }
+      #group_tapbox {
+        width: 400px;
+        height: 400px;
+        left: 30px;
+        float: left;
+      }
+      .group_single_box {
+        width: 60px;
+        height: 60px;
+        background-color: #bbb;
+        float: left;
+        margin: 5px;
+      }
+      .group_single_box:nth-child(2n) {
+        background-color: #565656;
       }
     </style>
     <script type="text/javascript" charset="utf-8">
-      
+      $(document).ready(function(){
+        $('#single_tapbox').tappable({
+          tapped: function(r) {
+            tap_action('tapped single box', r);
+          }
+        });
+        $('#group_tapbox').tappable({
+          target_class: ['group_single_box'],
+          parent_passthrough: true,
+          tap_missed: function(r) {
+            window.text = r.target;
+            console.log('tapped outside of class', r.target);
+          },
+          tapped: function(r) {
+            tap_action('tapped group', r);
+          },
+        });
+      })
+
+      var tap_action = function(name, event) {
+        console.log(name, event.parent, event.target);
+      }
     </script>
 
   </head>
   <body>
-    <div id="tapbox"></div>
+    <div id="single_tapbox"></div>
+
+    <ul id='group_tapbox'>
+      <li class="group_single_box"></li>
+      <li class="group_single_box"></li>
+      <li class="group_single_box"></li>
+      <li class="group_single_box"></li>
+      <li class="group_single_box"></li>
+      <li class="group_single_box"></li>
+      <li class="group_single_box"></li>
+      <li class="group_single_box"></li>
+      <li class="group_single_box"></li>
+      <li class="group_single_box"></li>
+      <li class="group_single_box"></li>
+      <li class="group_single_box"></li>
+      <li class="group_single_box"></li>
+      <li class="group_single_box"></li>
+      <li class="group_single_box"></li>
+      <li class="group_single_box"></li>
+      <li class="group_single_box"></li>
+      <li class="group_single_box"></li>
+      <li class="group_single_box"></li>
+      <li class="group_single_box"></li>
+    </ul>
   </body>
 </html>

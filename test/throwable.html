@@ -1,0 +1,32 @@
+<html>
+  <head>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../vendor/underscore/underscore.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../lib/smooth.core.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../lib/smooth.layer.js" type="text/javascript" charset="utf-8"></script>
+    <style type="text/css" media="screen">
+      #single_tapbox {
+        width: 400px;
+        height: 400px;
+        background-color: #aaa;
+        float: left;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+      }
+    </style>
+    <script type="text/javascript" charset="utf-8">
+      $(document).ready(function(){
+        $('#single_tapbox').throwable({
+          container: $('body')
+        });
+
+        console.log('run');
+      })
+    </script>
+
+  </head>
+  <body>
+    <div id="single_tapbox"></div>
+  </body>
+</html>
