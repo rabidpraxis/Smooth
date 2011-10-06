@@ -6,11 +6,10 @@ TRANFORM_TYPE = "3d"
 $.fn.toss = (vel) ->
   $obj = this
   mag = do ->
-    unless $obj.data("constraint")?
-      if $obj.data("constraint") == "y"
-        vel.y
-      else if $obj.data("constraint") == "x"
-        vel.x
+    if $obj.data("constraint") == "y"
+      vel.y
+    else if $obj.data("constraint") == "x"
+      vel.x
     else
       Math.sqrt(vel.x * vel.x + vel.y * vel.y)
 
@@ -18,12 +17,8 @@ $.fn.toss = (vel) ->
 
   speed_add = mag * .21
   translate_delta =
-    # x: ( vel.x * 10 + speed_add),
-    # y: ( vel.y * 10 + speed_add)
     x: ( vel.x * 10.20),
     y: ( vel.y * 10.20)
-    # x: ( vel.x * 7),
-    # y: ( vel.y * 7)
   translateY = ($obj.position().top  + translate_delta.y)
   translateX = ($obj.position().left + translate_delta.x)
   time_cof   = (Math.abs(mag - 180) / 180) * 2.5
@@ -37,9 +32,9 @@ $.fn.toss = (vel) ->
       'Time Coeffecient':  time_cof
   
   time_add = ( mag * .7 )
+  console.log time_add
   $obj.transition
     time: .8 + time_add
-    # time: 1.5
   $obj.transform
     tX: translateX
     tY: translateY
@@ -59,8 +54,7 @@ $.fn.move = (obj) ->
   trans =
     tY: o_pos.top + obj.tY
     tX: o_pos.left + obj.tX
-  @transform trans
-  
+  @.transform trans
   @
 # }}}
 # $.stop(): Stop transition animation {{{1
