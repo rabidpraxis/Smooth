@@ -1,1 +1,9 @@
 Smooth - Made for smead
+-----------------------
+
+An evolving javascript lib we use internally here at [The
+Program](http://www.theprogrampdx.com) with our touchscreens. The goal is to
+emulate iOS interactions as close as possible. This script includes the ability
+for throwing, tapping, and sliding.
+
+It is optimized for use with the Apple Safari browser.
