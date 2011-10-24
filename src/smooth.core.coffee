@@ -1,3 +1,4 @@
+$ = jQuery
 clickable = true
 window.display_stats = false
 attract_timeout = 5000
